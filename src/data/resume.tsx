@@ -26,6 +26,7 @@ export const DATA = {
     "PHP",
     "Figma",
     "Google Cloud",
+    "Git",
   ],
   navbar: [
     { href: "/", icon: HomeIcon, label: "Home" },
