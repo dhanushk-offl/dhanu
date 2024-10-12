@@ -193,10 +193,10 @@ export const DATA = {
       dates: "October 2024",
       active: true,
       description:
-        "Designed and Developed a responsive portfolio using sveltekit as well Next.Js framework, for fast and reliable performance and well experienced UI",
+        "Designed and Developed a responsive portfolio using Next.Js framework, for fast and reliable performance and well experienced UI",
       technologies: [
-        "Svelte",
         "Next.js",
+        "React.js",
         "Typescript",
         "TailwindCSS",
         "Github Actions",
@@ -211,11 +211,43 @@ export const DATA = {
         },
         {
           type: "Github",
-          href: "https://github.com/dhanushk-offl/dhanush",
+          href: "https://github.com/dhanushk-offl/dhanu",
           icon: <Icons.github className="size-3" />
         }
       ],
       image: "/portfolio.png",
+      video:
+        "",
+    },
+    {
+      title: "Dhanush's Portfolio",
+      href: "https://dhanush.pages.dev",
+      dates: "July 2024",
+      active: true,
+      description:
+        "Designed and Developed a responsive portfolio using sveltekit framework, for fast and reliable performance and well experienced UI",
+      technologies: [
+        "Svelte",
+        "Typescript",
+        "TailwindCSS",
+        "Vite",
+        "Github Actions",
+        "Cloudflare",
+        "Cloudflare Workers",
+      ],
+      links: [
+        {
+          type: "Website",
+          href: "https://dhanush.pages.dev/",
+          icon: <Icons.globe className="size-3" />,
+        },
+        {
+          type: "Github",
+          href: "https://github.com/dhanushk-offl/dhanush",
+          icon: <Icons.github className="size-3" />
+        }
+      ],
+      image: "/portfolio2.png",
       video:
         "",
     },
