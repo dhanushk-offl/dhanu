@@ -1,4 +1,3 @@
-"use client";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Send, Trash2, Sparkles, User } from "lucide-react";
@@ -86,7 +85,7 @@ export default function Conversation() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch response from API');
+        throw new Error("Failed to fetch response from API");
       }
 
       const data = await response.json();
@@ -98,7 +97,7 @@ export default function Conversation() {
       console.error("Error fetching response:", error);
       setMessages((prevMessages) => [
         ...prevMessages,
-        { message: "Oops! My circuits got a bit tangled. Let we try that again, shall we?", sender: "model" as const },
+        { message: "Oops! My circuits got a bit tangled. Let&apos;s try that again, shall we?", sender: "model" as const },
       ]);
     } finally {
       setIsTyping(false);
@@ -133,7 +132,7 @@ export default function Conversation() {
 
   const adjustTextareaHeight = () => {
     if (newMessage.current) {
-      newMessage.current.style.height = 'auto';
+      newMessage.current.style.height = "auto";
       newMessage.current.style.height = `${newMessage.current.scrollHeight}px`;
     }
   };
@@ -171,7 +170,7 @@ export default function Conversation() {
                 </div>
               </div>
               <p className="text-2xl font-bold text-black">
-                Naan Dan! Kaipulla, your quirky AI pal. Let &apos;s chat about anything and everything - I promise it&apos;ll be a hoot! 🦉
+                Naan Dan! Kaipulla, your quirky AI pal. Let&apos;s chat about anything and everything - I promise it&apos;ll be a hoot! 🦉
               </p>
             </div>
           </div>
@@ -194,7 +193,7 @@ export default function Conversation() {
             ref={newMessage}
             rows={1}
             onChange={adjustTextareaHeight}
-            style={{ minHeight: '48px', maxHeight: '200px' }}
+            style={{ minHeight: "48px", maxHeight: "200px" }}
           />
           <button
             type="submit"
