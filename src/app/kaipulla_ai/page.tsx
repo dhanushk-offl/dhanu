@@ -15,7 +15,7 @@ const ChatMessage = ({ message, sender }: Message) => {
       {!isUser && (
         <div className="relative mr-2">
           <div className="w-12 h-12 rounded-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex-shrink-0">
-            <img 
+          <img 
               src="/avatar.jpg" 
               alt="AI Avatar" 
               className="w-full h-full object-cover"
@@ -35,7 +35,7 @@ const ChatMessage = ({ message, sender }: Message) => {
       >
         <div 
           className="text-base font-bold prose prose-lg max-w-none"
-          dangerouslySetInnerHTML={{ __html: message }}
+          dangerouslySetInnerHTML={{ __html: message.replace(/'/g, "&rsquo;") }} // Escape single quotes
         />
         <time className="text-xs font-mono mt-2 block">
           {new Date().toLocaleTimeString("en-US", {
@@ -46,7 +46,7 @@ const ChatMessage = ({ message, sender }: Message) => {
         </time>
       </div>
       {isUser && (
-        <div className="w-12 h-12 rounded-full bg-blue-500 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex-shrink-0 ml-2 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-black bg-blue-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex-shrink-0 ml-2 flex items-center justify-center">
           <User size={24} className="text-white" />
         </div>
       )}
@@ -89,7 +89,7 @@ export default function Conversation() {
       const data = await response.json();
       setMessages((prevMessages) => [
         ...prevMessages,
-        { message: data.response, sender: "model" as const },
+        { message: data.response.replace(/'/g, "&rsquo;"), sender: "model" as const }, // Escape single quotes
       ]);
     } catch (error) {
       console.error("Error fetching response:", error);
@@ -139,7 +139,7 @@ export default function Conversation() {
     <div className="h-screen flex flex-col bg-gradient-to-br from-purple-400 to-blue-400 font-sans">
       <header className="bg-yellow-300 shadow-[0_4px_0px_0px_rgba(0,0,0,1)] border-b-4 border-black p-4">
         <h1 className="text-3xl font-extrabold text-center text-black transform -rotate-2">
-          KAIPULLA: Dhanu's Quirky AI Buddy
+          KAIPULLA: Dhanu&apos;s Quirky AI Buddy {/* Escape apostrophe */}
         </h1>
       </header>
 
@@ -154,7 +154,7 @@ export default function Conversation() {
           <div className="flex items-center justify-center h-full">
             <div className="bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-black rounded-lg p-8 max-w-md text-center transform rotate-2">
               <div className="relative w-24 h-24 mx-auto mb-4">
-                <div className="w-24 h-24 rounded-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+              <div className="w-24 h-24 rounded-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
                   <img 
                     src="/avatar.jpg" 
                     alt="AI Avatar" 
@@ -166,7 +166,7 @@ export default function Conversation() {
                 </div>
               </div>
               <p className="text-2xl font-bold text-black">
-                Naan Dan! Kaipulla, your quirky AI pal. Let's chat about anything and everything - I promise it'll be a hoot! 🦉
+                Naan Dan! Kaipulla, your quirky AI pal. Let&apos;s chat about anything and everything - I promise it&apos;ll be a hoot! 🦉 {/* Escape apostrophe */}
               </p>
             </div>
           </div>
@@ -187,26 +187,24 @@ export default function Conversation() {
             className="flex-grow p-3 border-4 border-black rounded-2xl focus:outline-none focus:ring-4 focus:ring-yellow-300 font-bold text-lg resize-none overflow-hidden"
             placeholder="Tell me something wacky..."
             ref={newMessage}
-            rows={1}
-            onChange={adjustTextareaHeight}
-            style={{ minHeight: '48px', maxHeight: '200px' }}
+            onInput={adjustTextareaHeight} // Adjust height on input
           />
           <button
             type="submit"
+            className={`p-3 bg-blue-500 text-white rounded-full hover:bg-blue-700 transition ${
+              isTyping ? "opacity-50 cursor-not-allowed" : "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black"
+            }`}
             disabled={isTyping}
-            className="bg-pink-500 text-white p-4 rounded-full hover:bg-pink-600 transition-colors duration-200 disabled:opacity-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black"
           >
             <Send size={24} />
           </button>
-          {messages.length > 0 && (
-            <button
-              type="button"
-              onClick={clearMessages}
-              className="bg-red-500 text-white p-4 rounded-full hover:bg-red-600 transition-colors duration-200 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black"
-            >
-              <Trash2 size={24} />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={clearMessages}
+            className={`p-3 bg-red-500 text-white rounded-full hover:bg-red-700 transition shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black`}
+          >
+            <Trash2 size={24} />
+          </button>
         </form>
       </footer>
     </div>
