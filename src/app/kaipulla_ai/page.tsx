@@ -171,7 +171,7 @@ export default function Conversation() {
                 </div>
               </div>
               <p className="text-2xl font-bold text-black">
-                Naan Dan! Kaipulla, your quirky AI pal. Let&apos;s chat about anything and everything - I promise it&apos;ll be a hoot! 🦉
+              Hello!👋 Dubai ah? Naan Dan! Kaipulla, your quirky AI pal. Let&apos;s chat about anything and everything - I promise it&apos;ll be a hoot! 🦉
               </p>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function Conversation() {
           <textarea
             disabled={isTyping}
             className="flex-grow p-3 border-4 border-black rounded-2xl focus:outline-none focus:ring-4 focus:ring-yellow-300 font-bold text-lg resize-none overflow-hidden"
-            placeholder="Hello!👋 Dubai ah?"
+            placeholder="Type here to chat.."
             ref={newMessage}
             rows={1}
             onChange={adjustTextareaHeight}
