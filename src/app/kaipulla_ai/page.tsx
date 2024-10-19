@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Send, Trash2, Sparkles, User } from "lucide-react";
 
 interface Message {
@@ -15,10 +16,12 @@ const ChatMessage = ({ message, sender }: Message) => {
       {!isUser && (
         <div className="relative mr-2">
           <div className="w-12 h-12 rounded-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex-shrink-0">
-            <img 
+            <Image 
               src="/avatar.jpg" 
               alt="AI Avatar" 
-              className="w-full h-full object-cover"
+              width={48}
+              height={48}
+              className="object-cover"
             />
           </div>
           <div className="absolute -bottom-2 -right-2 bg-yellow-300 rounded-full w-6 h-6 flex items-center justify-center border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
@@ -138,8 +141,8 @@ export default function Conversation() {
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-purple-400 to-blue-400 font-sans">
       <header className="bg-yellow-300 shadow-[0_4px_0px_0px_rgba(0,0,0,1)] border-b-4 border-black p-4">
-        <h1 className="text-4xl font-extrabold text-center text-black transform -rotate-2">
-          KAIPULLA: Your Quirky AI Buddy
+        <h1 className="text-3xl font-extrabold text-center text-black transform -rotate-2">
+          KAIPULLA: Quirky AI Buddy of Dhanu
         </h1>
       </header>
 
@@ -155,10 +158,12 @@ export default function Conversation() {
             <div className="bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-black rounded-lg p-8 max-w-md text-center transform rotate-2">
               <div className="relative w-24 h-24 mx-auto mb-4">
                 <div className="w-24 h-24 rounded-full border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                  <img 
+                  <Image 
                     src="/avatar.jpg" 
                     alt="AI Avatar" 
-                    className="w-full h-full object-cover"
+                    width={96}
+                    height={96}
+                    className="object-cover"
                   />
                 </div>
                 <div className="absolute -bottom-2 -right-2 bg-yellow-300 rounded-full w-8 h-8 flex items-center justify-center border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
@@ -166,7 +171,7 @@ export default function Conversation() {
                 </div>
               </div>
               <p className="text-2xl font-bold text-black">
-                Naan Dan! Kaipulla, your quirky AI pal. Let &#39;s chat about anything and everything - I promise it'll be a hoot! 🦉
+                Naan Dan! Kaipulla, your quirky AI pal. Let &apos;s chat about anything and everything - I promise it&apos;ll be a hoot! 🦉
               </p>
             </div>
           </div>
@@ -208,10 +213,6 @@ export default function Conversation() {
             </button>
           )}
         </form>
-        <div className="text-center mt-4 text-lg font-bold">
-          Created By <a href="https://itsdhanu.me">Dhanush Kandhan</a> | 
-          Thanks to <a href="https://varunraj.in">Varunraj</a>
-        </div>
       </footer>
     </div>
   );
