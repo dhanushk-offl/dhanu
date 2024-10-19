@@ -190,7 +190,7 @@ export default function Conversation() {
           <textarea
             disabled={isTyping}
             className="flex-grow p-3 border-4 border-black rounded-2xl focus:outline-none focus:ring-4 focus:ring-yellow-300 font-bold text-lg resize-none overflow-hidden"
-            placeholder="Tell me something wacky..."
+            placeholder="Hello!👋 Dubai ah?"
             ref={newMessage}
             rows={1}
             onChange={adjustTextareaHeight}
@@ -213,6 +213,9 @@ export default function Conversation() {
             </button>
           )}
         </form>
+        <div className="text-center mt-4 text-lg font-bold">
+        <a href="https://itsdhanu.me" target="_blank" className="underline">Venaa..</a> Valikuthu.. Aluthuruven!
+        </div>
       </footer>
     </div>
   );
