@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Send, Trash2, Sparkles, User } from "lucide-react";
