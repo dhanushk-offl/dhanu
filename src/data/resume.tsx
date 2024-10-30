@@ -251,6 +251,31 @@ export const DATA = {
       video:
         "",
     },
+    {
+      title: "AI Resume Analyzer",
+      href: "https://github.com/dhanushk-offl/resume-analyzer",
+      dates: "June 2024",
+      active: true,
+      description:
+        "Engineer an AI-powered resume scoring application incorporating the Llama 3 AI model. The application will analyze resumes against predefined skill sets and job descriptions, generating a numerical score indicative of overall suitability.",
+      technologies: [
+        "Python",
+        "Streamlit",
+        "Groq",
+        "Meta AI",
+        "Github Actions",
+      ],
+      links: [
+        {
+          type: "Github",
+          href: "https://github.com/dhanushk-offl/resume-analyzer",
+          icon: <Icons.github className="size-3" />
+        }
+      ],
+      image: "/ai-resume-proj.png",
+      video:
+        "",
+    },
   ],
 community: [
   {
