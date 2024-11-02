@@ -20,7 +20,9 @@ const BLUR_FADE_DELAY = 0.04;
 const DynamicKaipullaAi = dynamic(() => import('@/app/kaipulla_ai/page'), {
   ssr: false,
 });
-
+const LineLens = dynamic(() => import('@/app/linelens/page'), {
+  ssr: false,
+});
 export default function Page() {
   const [showKaipullaAi, setShowKaipullaAi] = useState(false);
 
@@ -33,6 +35,18 @@ export default function Page() {
 
   if (showKaipullaAi) {
     return <DynamicKaipullaAi />;
+  }
+  const [showLineLens, setShowLineLens] = useState(false);
+
+  useEffect(() => {
+    // Check if the current path is /linelens
+    if (window.location.pathname === '/linelens') {
+      setShowLineLens(true);
+    }
+  }, []);
+
+  if (showLineLens) {
+    return <LineLens />;
   }
 
   return (
