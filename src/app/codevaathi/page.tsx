@@ -130,7 +130,7 @@ const parseHTML = (html: string) => {
                   Code வாத்தி
                 </h1>
                 <p className="text-gray-400">
-                Code Explanation Made Simple in our own language by lines. 🙌✨
+                Breaking Down Code, Line by Line, in Your Own Language. 🙌✨
                 </p>
 
               </div>
