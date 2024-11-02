@@ -1,9 +1,21 @@
 "use client";
-import React, { useState } from 'react';
-import { Sparkles, ChevronDown, Copy, Check, Code2, Loader } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, ChevronDown, Copy, Check, Code2, Loader, Volume2, VolumeX } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
-export default function CodeExplainer() {
+// Language configuration interface
+interface LanguageConfig {
+  id: string;
+  name: string;
+  bcp47: string;
+}
+
+// Props interface (if you need to pass props)
+interface CodeExplainerProps {
+  apiEndpoint?: string;
+}
+
+export default function CodeExplainer({ apiEndpoint = 'https://genai-tools.skcript.com/api/ullam' }: CodeExplainerProps) {
   // State management
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('english');
@@ -11,16 +23,34 @@ export default function CodeExplainer() {
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
 
-  // Language options
-  const languages = [
-    { id: 'english', name: 'English' },
-    { id: 'tamil', name: 'தமிழ்' },
-    { id: 'hindi', name: 'हिन्दी' },
-    { id: 'telugu', name: 'తెలుగు' },
+  // Initialize speech synthesis
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSpeechSynthesis(window.speechSynthesis);
+    }
+  }, []);
+
+  // Language options with BCP 47 language tags
+  const languages: LanguageConfig[] = [
+    { id: 'english', name: 'English', bcp47: 'en-US' },
+    { id: 'tamil', name: 'தமிழ்', bcp47: 'ta-IN' },
+    { id: 'hindi', name: 'हिन्दी', bcp47: 'hi-IN' },
+    { id: 'telugu', name: 'తెలుగు', bcp47: 'te-IN' },
   ];
 
-  // Main function to handle code explanation
+  // Clean up speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      if (speechSynthesis) {
+        speechSynthesis.cancel();
+      }
+    };
+  }, [speechSynthesis]);
+
+  // Handle code explanation request
   const handleExplain = async () => {
     if (!code.trim()) return;
 
@@ -28,7 +58,7 @@ export default function CodeExplainer() {
     setError(null);
 
     try {
-      const response = await fetch(`https://genai-tools.skcript.com/api/ullam`, {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,19 +70,17 @@ export default function CodeExplainer() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-
-      // Validate response data
+      
       if (!data || !data.response) {
         throw new Error('Invalid response format from API');
       }
 
-      const explanationText = typeof data.response === 'string'
-        ? data.response
+      const explanationText = typeof data.response === 'string' 
+        ? data.response 
         : JSON.stringify(data.response);
 
       setExplanation(explanationText);
@@ -65,7 +93,7 @@ export default function CodeExplainer() {
     }
   };
 
-  // Function to handle copying explanation to clipboard
+  // Handle copying explanation to clipboard
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(explanation);
@@ -77,46 +105,86 @@ export default function CodeExplainer() {
     }
   };
 
-  // Clear function to reset the form
+  // Handle clearing the form
   const handleClear = () => {
     setCode('');
     setExplanation('');
     setError(null);
+    if (speechSynthesis) {
+      speechSynthesis.cancel();
+    }
+    setIsSpeaking(false);
   };
 
- // Function to safely parse and render HTML
-const parseHTML = (html: string) => {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-
-  // Sanitize and convert the HTML elements to React elements
-  const traverseNodes = (node: Node): React.ReactNode => {
-    if (node.nodeType === Node.TEXT_NODE) {
-      return node.textContent;
+  // Get plain text from HTML/Markdown content
+  const getPlainText = (content: string): string => {
+    if (content.startsWith('<')) {
+      const div = document.createElement('div');
+      div.innerHTML = content;
+      return div.textContent || '';
     }
-
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = node as HTMLElement;
-      const props: { [key: string]: any } = {};
-
-      // Handle attributes, converting 'class' to 'className'
-      Array.from(element.attributes).forEach(attr => {
-        props[attr.name === 'class' ? 'className' : attr.name] = attr.value;
-      });
-
-      const children = Array.from(element.childNodes).map(traverseNodes);
-
-      return React.createElement(element.tagName.toLowerCase(), props, ...children);
-    }
-
-    return null;
+    return content;
   };
 
-  return traverseNodes(div);
-};
+  // Handle text-to-speech
+  const handleSpeak = () => {
+    if (!speechSynthesis) return;
 
+    if (isSpeaking) {
+      speechSynthesis.cancel();
+      setIsSpeaking(false);
+      return;
+    }
 
-  // Render component
+    const text = getPlainText(explanation);
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    const languageConfig = languages.find(lang => lang.id === language);
+    utterance.lang = languageConfig?.bcp47 || 'en-US';
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+    };
+
+    utterance.onerror = (event) => {
+      console.error('Speech synthesis error:', event);
+      setIsSpeaking(false);
+      setError('Text-to-speech failed. Please try again.');
+    };
+
+    speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
+  };
+
+  // Parse HTML content safely
+  const parseHTML = (html: string): React.ReactNode => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+
+    const traverseNodes = (node: Node): React.ReactNode => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent;
+      }
+
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const element = node as HTMLElement;
+        const props: { [key: string]: any } = {};
+
+        Array.from(element.attributes).forEach(attr => {
+          props[attr.name === 'class' ? 'className' : attr.name] = attr.value;
+        });
+
+        const children = Array.from(element.childNodes).map(traverseNodes);
+
+        return React.createElement(element.tagName.toLowerCase(), props, ...children);
+      }
+
+      return null;
+    };
+
+    return traverseNodes(div);
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
@@ -130,9 +198,8 @@ const parseHTML = (html: string) => {
                   Code வாத்தி
                 </h1>
                 <p className="text-gray-400">
-                Breaking Down Code, Line by Line, in Your Own Language. 🙌✨
+                  Breaking Down Code, Line by Line, in Your Own Language. 🙌✨
                 </p>
-
               </div>
             </div>
 
@@ -203,19 +270,35 @@ const parseHTML = (html: string) => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold">Explanation</h2>
-              {explanation && (
-                <button
-                  onClick={copyToClipboard}
-                  className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
-                >
-                  {copied ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                  {copied ? 'Copied!' : 'Copy'}
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {explanation && (
+                  <>
+                    <button
+                      onClick={handleSpeak}
+                      className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
+                      title={isSpeaking ? 'Stop Reading' : 'Read Aloud'}
+                    >
+                      {isSpeaking ? (
+                        <VolumeX className="w-4 h-4" />
+                      ) : (
+                        <Volume2 className="w-4 h-4" />
+                      )}
+                    </button>
+                    <button
+                      onClick={copyToClipboard}
+                      className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
+                      title={copied ? 'Copied!' : 'Copy to Clipboard'}
+                    >
+                      {copied ? (
+                        <Check className="w-4 h-4" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                      {copied ? 'Copied!' : 'Copy'}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
 
             <div className="relative h-[calc(100vh-300px)] rounded-lg p-4 overflow-auto bg-gray-800 border-gray-700 border">
@@ -226,7 +309,6 @@ const parseHTML = (html: string) => {
               )}
 
               {explanation ? (
-                // Determine if the explanation is HTML or Markdown and render accordingly
                 <div>
                   {explanation.startsWith('<') ? (
                     parseHTML(explanation)
@@ -245,9 +327,21 @@ const parseHTML = (html: string) => {
           </div>
         </div>
       </main>
-      <p className="text-gray-400 text-center">
-                  Crafted by <a href="/" target="_blank" rel="noopener noreferrer" className='text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent'>Dhanu</a>
-                </p>
+      
+      {/* Footer */}
+      <footer className="py-4">
+        <p className="text-gray-400 text-center">
+          Crafted by{' '}
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
+          >
+            Dhanu
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
