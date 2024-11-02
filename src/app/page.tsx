@@ -25,25 +25,22 @@ const LineLens = dynamic(() => import('@/app/linelens/page'), {
 });
 export default function Page() {
   const [showKaipullaAi, setShowKaipullaAi] = useState(false);
-
-  useEffect(() => {
-    // Check if the current path is /kaipulla_ai
-    if (window.location.pathname === '/kaipulla_ai') {
-      setShowKaipullaAi(true);
-    }
-  }, []);
-
-  if (showKaipullaAi) {
-    return <DynamicKaipullaAi />;
-  }
   const [showLineLens, setShowLineLens] = useState(false);
 
   useEffect(() => {
-    // Check if the current path is /linelens
+    // Check both paths in a single useEffect
+    if (window.location.pathname === '/kaipulla_ai') {
+      setShowKaipullaAi(true);
+    }
     if (window.location.pathname === '/linelens') {
       setShowLineLens(true);
     }
   }, []);
+
+  // Move conditional renders after all hooks
+  if (showKaipullaAi) {
+    return <DynamicKaipullaAi />;
+  }
 
   if (showLineLens) {
     return <LineLens />;
