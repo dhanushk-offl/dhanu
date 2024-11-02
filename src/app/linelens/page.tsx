@@ -15,9 +15,9 @@ export default function CodeExplainer() {
   // Language options
   const languages = [
     { id: 'english', name: 'English' },
-    { id: 'tamil', name: 'Tamil' },
-    { id: 'hindi', name: 'Hindi' },
-    { id: 'telugu', name: 'Telugu' },
+    { id: 'tamil', name: 'தமிழ்' },
+    { id: 'hindi', name: 'हिन्दी' },
+    { id: 'telugu', name: 'తెలుగు' },
   ];
 
   // Main function to handle code explanation
@@ -127,10 +127,10 @@ const parseHTML = (html: string) => {
               <Code2 className="w-8 h-8 text-blue-500" />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-                  CodeLens
+                  LineLens
                 </h1>
                 <p className="text-gray-400">
-                  Code Explanation Made Simple
+                Code Explanation Made Simple in our own language by lines. 🙌✨
                 </p>
 
               </div>
