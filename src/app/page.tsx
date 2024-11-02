@@ -20,7 +20,7 @@ const BLUR_FADE_DELAY = 0.04;
 const DynamicKaipullaAi = dynamic(() => import('@/app/kaipulla_ai/page'), {
   ssr: false,
 });
-const CodeVaathi = dynamic(() => import('@/app/codevaathi/page').then(mod => mod.default), {
+const CodeVaathi = dynamic(() => import('@/app/codevaathi/page'), {
   ssr: false,
 });
 export default function Page() {
