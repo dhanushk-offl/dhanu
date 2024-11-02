@@ -127,7 +127,7 @@ const parseHTML = (html: string) => {
               <Code2 className="w-8 h-8 text-blue-500" />
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-                  LineLens
+                  Code வாத்தி
                 </h1>
                 <p className="text-gray-400">
                 Code Explanation Made Simple in our own language by lines. 🙌✨
