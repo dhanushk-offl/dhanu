@@ -10,12 +10,15 @@ interface LanguageConfig {
   bcp47: string;
 }
 
-// Props interface (if you need to pass props)
-interface CodeExplainerProps {
+// Define the props interface as a type instead
+type CodeExplainerProps = {
   apiEndpoint?: string;
-}
+};
 
-export default function CodeExplainer({ apiEndpoint = 'https://genai-tools.skcript.com/api/ullam' }: CodeExplainerProps) {
+// Explicitly type the component as a React FC
+const CodeExplainer: React.FC<CodeExplainerProps> = ({ 
+  apiEndpoint = 'https://genai-tools.skcript.com/api/ullam' 
+}) => {
   // State management
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('english');
@@ -157,9 +160,9 @@ export default function CodeExplainer({ apiEndpoint = 'https://genai-tools.skcri
   };
 
   // Parse HTML content safely
-  const parseHTML = (html: string): React.ReactNode => {
+  const parseHTML = (content: string): React.ReactNode => {
     const div = document.createElement('div');
-    div.innerHTML = html;
+    div.innerHTML = content;
 
     const traverseNodes = (node: Node): React.ReactNode => {
       if (node.nodeType === Node.TEXT_NODE) {
@@ -187,6 +190,7 @@ export default function CodeExplainer({ apiEndpoint = 'https://genai-tools.skcri
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
+      {/* Rest of your JSX remains the same */}
       {/* Header */}
       <header className="border-b border-gray-800 sticky top-0 z-10 backdrop-blur-md bg-opacity-80 bg-gray-900">
         <div className="container mx-auto p-4">
@@ -344,4 +348,6 @@ export default function CodeExplainer({ apiEndpoint = 'https://genai-tools.skcri
       </footer>
     </div>
   );
-}
+};
+
+export default CodeExplainer;
