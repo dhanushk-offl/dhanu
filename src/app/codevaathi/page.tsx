@@ -172,7 +172,7 @@ export default function CodeExplainer() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: `Please provide a detailed line-by-line explanation of the following code in ${language}, covering its functionality, logic, and purpose. Explain it like a friendly coding buddy who speaks ${language}. Make it fun, point out any bugs, suggest improvements, and wrap up with helpful tips. Act like a supportive friend! ${code}`,
+          message: `Please break down each line of the following code in ${language} with a friendly, step-by-step explanation. Describe the functionality, purpose, and any interesting logic in easy-to-read bullet points. Imagine you're a coding buddy, guiding someone through the code. Make it fun, point out any bugs or potential improvements, and wrap it up with helpful tips to make the code even better. Here’s the code: ${code}`,
           history: [],
         }),
       });
