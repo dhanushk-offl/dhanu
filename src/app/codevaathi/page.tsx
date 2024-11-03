@@ -1,42 +1,24 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, ChevronDown, Copy, Check, Code2, Loader, Volume2, VolumeX } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 export default function CodeExplainer() {
-  // Existing state management
+  // State management
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('english');
   const [explanation, setExplanation] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showError, setShowError] = useState(false);
   
   // Text-to-speech state
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
-  
-  // Animation states
-  const [isHovered, setIsHovered] = useState(false);
-  const [showGlow, setShowGlow] = useState(false);
+  const speechSynthesisRef = useRef<SpeechSynthesis | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   
   // Ref for the explanation content div
-  const explanationRef = React.useRef<HTMLDivElement>(null);
-
-  // Initialize speech synthesis and animation effects
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setSpeechSynthesis(window.speechSynthesis);
-    }
-
-    // Glow animation effect
-    const interval = setInterval(() => {
-      setShowGlow(prev => !prev);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const explanationRef = useRef<HTMLDivElement>(null);
 
   const languages = [
     { id: 'english', name: 'English', speechCode: 'en-US' },
@@ -45,7 +27,36 @@ export default function CodeExplainer() {
     { id: 'telugu', name: 'తెలుగు', speechCode: 'te-IN' },
   ];
 
-  // Function to extract readable text from HTML/Markdown content
+  // Initialize speech synthesis on component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      speechSynthesisRef.current = window.speechSynthesis;
+    }
+
+    // Cleanup function
+    return () => {
+      if (utteranceRef.current && speechSynthesisRef.current) {
+        speechSynthesisRef.current.cancel();
+        setIsSpeaking(false);
+      }
+    };
+  }, []);
+
+  // Handle visibility change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && isSpeaking) {
+        stopSpeaking();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isSpeaking]);
+
   const getReadableText = (): string => {
     if (!explanationRef.current) return '';
 
@@ -73,21 +84,25 @@ export default function CodeExplainer() {
       text += node.textContent + ' ';
     }
 
-    return text.replace(/\s+/g, ' ').trim();
+    return text
+      .replace(/\s+/g, ' ')
+      .replace(/\n+/g, ' ')
+      .trim();
   };
 
-  // Updated handleSpeak function with better error handling
-  const handleSpeak = () => {
-    if (!speechSynthesis) {
-      setError('Speech synthesis not supported in your browser');
-      setShowError(true);
-      setTimeout(() => setShowError(false), 3000);
-      return;
+  const stopSpeaking = () => {
+    if (speechSynthesisRef.current) {
+      speechSynthesisRef.current.cancel();
+      setIsSpeaking(false);
+      utteranceRef.current = null;
     }
+  };
+
+  const handleSpeak = () => {
+    if (!speechSynthesisRef.current || !explanation) return;
 
     if (isSpeaking) {
-      speechSynthesis.cancel();
-      setIsSpeaking(false);
+      stopSpeaking();
       return;
     }
 
@@ -95,65 +110,41 @@ export default function CodeExplainer() {
     
     if (!textToRead) {
       setError('No readable content found');
-      setShowError(true);
-      setTimeout(() => setShowError(false), 3000);
       return;
     }
 
     try {
-      const utterance = new SpeechSynthesisUtterance(textToRead);
+      utteranceRef.current = new SpeechSynthesisUtterance(textToRead);
       const currentLang = languages.find(lang => lang.id === language);
-      utterance.lang = currentLang?.speechCode || 'en-US';
+      utteranceRef.current.lang = currentLang?.speechCode || 'en-US';
       
-      utterance.onend = () => {
+      utteranceRef.current.onend = () => {
         setIsSpeaking(false);
+        utteranceRef.current = null;
       };
 
-      utterance.onerror = (event) => {
+      utteranceRef.current.onerror = (event) => {
+        console.error('Speech synthesis error:', event);
         setIsSpeaking(false);
-        if (event.error !== 'interrupted') {
-          setError('Text-to-speech failed. Please try again.');
-          setShowError(true);
-          setTimeout(() => setShowError(false), 3000);
-        }
+        utteranceRef.current = null;
+        setError('Text-to-speech failed. Please try again.');
       };
 
       setIsSpeaking(true);
-      speechSynthesis.speak(utterance);
-    } catch (err) {
-      console.error('Speech synthesis error:', err);
-      setError('Failed to initialize speech. Please try again.');
-      setShowError(true);
-      setTimeout(() => setShowError(false), 3000);
+      speechSynthesisRef.current.speak(utteranceRef.current);
+    } catch (error) {
+      console.error('Speech synthesis error:', error);
+      setError('Failed to initialize text-to-speech. Please try again.');
+      setIsSpeaking(false);
     }
   };
 
-  // Clean up speech synthesis on unmount
-  useEffect(() => {
-    return () => {
-      if (speechSynthesis && isSpeaking) {
-        speechSynthesis.cancel();
-      }
-    };
-  }, [speechSynthesis, isSpeaking]);
-
-  const handleClear = () => {
-    if (speechSynthesis && isSpeaking) {
-      speechSynthesis.cancel();
-    }
-    setIsSpeaking(false);
-    setCode('');
-    setExplanation('');
-    setError(null);
-    setShowError(false);
-  };
-
-  // Existing functions remain the same
   const handleExplain = async () => {
     if (!code.trim()) return;
 
     setIsLoading(true);
     setError(null);
+    stopSpeaking(); // Stop any ongoing speech
 
     try {
       const response = await fetch(`https://genai-tools.skcript.com/api/ullam`, {
@@ -168,12 +159,10 @@ export default function CodeExplainer() {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-
       if (!data || !data.response) {
         throw new Error('Invalid response format from API');
       }
@@ -185,7 +174,7 @@ export default function CodeExplainer() {
       setExplanation(explanationText);
     } catch (error) {
       console.error('Error fetching response:', error);
-      setError('Oops! An error occurred. Please try again.');
+      setError('Failed to get explanation. Please try again.');
       setExplanation('');
     } finally {
       setIsLoading(false);
@@ -201,6 +190,13 @@ export default function CodeExplainer() {
       console.error('Failed to copy:', err);
       setError('Failed to copy to clipboard');
     }
+  };
+
+  const handleClear = () => {
+    setCode('');
+    setExplanation('');
+    setError(null);
+    stopSpeaking();
   };
 
   const parseHTML = (html: string) => {
@@ -232,33 +228,18 @@ export default function CodeExplainer() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-full h-full bg-[radial-gradient(circle_500px_at_50%_50%,#1f2937,transparent)] animate-pulse" />
-        <div className="absolute -inset-[10px] opacity-50">
-          <div className="w-full h-full bg-gradient-to-r from-transparent via-blue-500/10 to-transparent absolute transform -skew-y-12 animate-[gradient_8s_ease-in-out_infinite]" />
-        </div>
-      </div>
-
-      {/* Header with hover effects */}
-      <header className="border-b border-gray-800/50 sticky top-0 z-10 backdrop-blur-md bg-gray-900/80">
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Header */}
+      <header className="border-b border-gray-800 sticky top-0 z-10 backdrop-blur-md bg-opacity-80 bg-gray-900">
         <div className="container mx-auto p-4">
           <div className="flex items-center justify-between">
-            <div 
-              className="flex items-center gap-3 transition-transform duration-300 hover:scale-105"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-            >
-              <Code2 className={`w-8 h-8 text-blue-500 transition-all duration-300 ${isHovered ? 'rotate-12' : ''}`} />
+            <div className="flex items-center gap-3">
+              <Code2 className="w-8 h-8 text-blue-500" />
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent relative">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
                   Code வாத்தி
-                  {showGlow && (
-                    <span className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-lg -z-10" />
-                  )}
                 </h1>
-                <p className="text-gray-400 animate-pulse">
+                <p className="text-gray-400">
                   Breaking Down Code, Line by Line, in Your Own Language. 🙌✨
                 </p>
               </div>
@@ -269,7 +250,7 @@ export default function CodeExplainer() {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="appearance-none rounded-lg px-4 py-2 pr-8 bg-gray-800/80 border-gray-700/50 focus:border-blue-500 border focus:outline-none transition-all duration-300 hover:bg-gray-700/80 backdrop-blur-sm"
+                  className="appearance-none rounded-lg px-4 py-2 pr-8 bg-gray-800 border-gray-700 focus:border-blue-500 border focus:outline-none transition-colors"
                 >
                   {languages.map((lang) => (
                     <option key={lang.id} value={lang.id}>
@@ -284,19 +265,17 @@ export default function CodeExplainer() {
         </div>
       </header>
 
-      {/* Main content with glass morphism and animations */}
-      <main className="container mx-auto p-4 relative z-10">
+      {/* Main Content */}
+      <main className="container mx-auto p-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Input Section */}
-          <div className="space-y-4 transform transition-all duration-300 hover:scale-[1.01]">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-                Source Code
-              </h2>
+              <h2 className="text-xl font-semibold">Source Code</h2>
               {code && (
                 <button
                   onClick={handleClear}
-                  className="text-sm text-gray-400 hover:text-white transition-colors hover:scale-110 transform duration-200"
+                  className="text-sm text-gray-400 hover:text-white transition-colors"
                 >
                   Clear
                 </button>
@@ -307,39 +286,37 @@ export default function CodeExplainer() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               placeholder="Paste your code here..."
-              className="relative w-full h-[calc(100vh-300px)] p-4 font-mono text-sm rounded-lg bg-gray-800/50 border-gray-700/50 focus:border-blue-500 border focus:outline-none transition-all duration-300 resize-none backdrop-blur-sm hover:bg-gray-800/80"
+              className="relative w-full h-[calc(100vh-300px)] p-4 font-mono text-sm rounded-lg bg-gray-800 border-gray-700 focus:border-blue-500 border focus:outline-none transition-colors resize-none"
             />
 
             <button
               onClick={handleExplain}
               disabled={isLoading || !code.trim()}
-              className={`w-full rounded-lg px-4 py-3 flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-[1.02] ${
+              className={`w-full rounded-lg px-4 py-3 flex items-center justify-center gap-2 transition-all duration-300 ${
                 isLoading || !code.trim()
-                  ? 'bg-gray-700/50 cursor-not-allowed opacity-50'
+                  ? 'bg-gray-700 cursor-not-allowed opacity-50'
                   : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90'
               }`}
             >
               {isLoading ? (
                 <Loader className="w-4 h-4 animate-spin" />
               ) : (
-                <Sparkles className="w-4 h-4 animate-pulse" />
+                <Sparkles className="w-4 h-4" />
               )}
               {isLoading ? 'Analyzing...' : 'Explain Code'}
             </button>
           </div>
 
           {/* Output Section */}
-          <div className="space-y-4 transform transition-all duration-300 hover:scale-[1.01]">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-                Explanation
-              </h2>
+              <h2 className="text-xl font-semibold">Explanation</h2>
               <div className="flex items-center gap-2">
                 {explanation && (
                   <>
                     <button
                       onClick={handleSpeak}
-                      className="flex items-center gap-1 text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
+                      className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
                       title={isSpeaking ? "Stop reading" : "Read aloud"}
                     >
                       {isSpeaking ? (
@@ -350,7 +327,7 @@ export default function CodeExplainer() {
                     </button>
                     <button
                       onClick={copyToClipboard}
-                      className="flex items-center gap-1 text-gray-400 hover:text-white transition-all duration-300 hover:scale-110"
+                      className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
                     >
                       {copied ? (
                         <Check className="w-4 h-4" />
@@ -366,16 +343,16 @@ export default function CodeExplainer() {
 
             <div 
               ref={explanationRef}
-              className="relative h-[calc(100vh-300px)] rounded-lg p-4 overflow-auto bg-gray-800/50 border-gray-700/50 border backdrop-blur-sm transition-all duration-300 hover:bg-gray-800/80"
+              className="relative h-[calc(100vh-300px)] rounded-lg p-4 overflow-auto bg-gray-800 border-gray-700 border"
             >
-              {showError && error && (
-                <div className="text-red-400 mb-4 p-2 rounded bg-red-900/20 border border-red-900/50 backdrop-blur-sm animate-fadeIn">
+              {error && (
+                <div className="text-red-400 mb-4 p-2 rounded bg-red-900/20 border border-red-900">
                   {error}
                 </div>
               )}
 
               {explanation ? (
-                <div className="animate-fadeIn">
+                <div>
                   {explanation.startsWith('<') ? (
                     parseHTML(explanation)
                   ) : (
@@ -385,7 +362,7 @@ export default function CodeExplainer() {
                   )}
                 </div>
               ) : (
-                <div className="text-center mt-8 text-gray-400 animate-pulse">
+                <div className="text-center mt-8 text-gray-400">
                   Your code explanation will appear here
                 </div>
               )}
@@ -393,19 +370,11 @@ export default function CodeExplainer() {
           </div>
         </div>
       </main>
-
-      {/* Footer with animation */}
-      <p className="text-gray-400 text-center py-4 animate-fadeIn">
-        Crafted by{' '}
-        <a 
-          href="/" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent hover:scale-110 inline-block transition-transform duration-300"
-        >
-          Dhanu
-        </a>
-      </p>
+      <footer className="py-4">
+        <p className="text-gray-400 text-center">
+          Crafted by <a href="/" target="_blank" rel="noopener noreferrer" className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">Dhanu</a>
+        </p>
+      </footer>
     </div>
   );
 }
