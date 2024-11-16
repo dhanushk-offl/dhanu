@@ -291,6 +291,13 @@ community: [
     image: "/chennaireact.png",
     href: "https://bento.me/chennaireact",
     dates: "April 2024 - Present",
+  },
+  {
+    name: "ChennaiPy",
+    role: "Community Volunteer",
+    image: "/chennaipy.png",
+    href: "https://chennaipy.org",
+    dates: "September 2024 - Present",
   }
 ]
 } as const;
