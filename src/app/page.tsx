@@ -16,10 +16,6 @@ import dynamic from 'next/dynamic';
 
 const BLUR_FADE_DELAY = 0.04;
 
-// Dynamically import KaipullaAi component
-const DynamicKaipullaAi = dynamic(() => import('@/app/kaipulla_ai/page'), {
-  ssr: false,
-});
 const CodeVaathi = dynamic(() => import('@/app/codevaathi/page'), {
   ssr: false,
 });
@@ -37,10 +33,6 @@ export default function Page() {
     }
   }, []);
 
-  // Move conditional renders after all hooks
-  if (showKaipullaAi) {
-    return <DynamicKaipullaAi />;
-  }
 
   if (showCodeVaathi) {
     return <CodeVaathi />;
