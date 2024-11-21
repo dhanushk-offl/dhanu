@@ -189,38 +189,6 @@ export const DATA = {
     },
     {
       title: "Dhanush's Portfolio",
-      href: "https://itsdhanu.me",
-      dates: "October 2024",
-      active: true,
-      description:
-        "Designed and Developed a responsive portfolio using Next.Js framework, for fast and reliable performance and well experienced UI",
-      technologies: [
-        "Next.js",
-        "React.js",
-        "Typescript",
-        "TailwindCSS",
-        "Github Actions",
-        "Cloudflare",
-        "Cloudflare Workers",
-      ],
-      links: [
-        {
-          type: "Website",
-          href: "https://itsdhanu.me/",
-          icon: <Icons.globe className="size-3" />,
-        },
-        {
-          type: "Github",
-          href: "https://github.com/dhanushk-offl/dhanu",
-          icon: <Icons.github className="size-3" />
-        }
-      ],
-      image: "/portfolio.png",
-      video:
-        "",
-    },
-    {
-      title: "Dhanush's Portfolio",
       href: "https://dhanush.pages.dev",
       dates: "July 2024",
       active: true,
@@ -254,7 +222,7 @@ export const DATA = {
     {
       title: "AI Resume Analyzer",
       href: "https://github.com/dhanushk-offl/resume-analyzer",
-      dates: "June 2024",
+      dates: "September 2024",
       active: true,
       description:
         "Engineer an AI-powered resume scoring application incorporating the Llama 3 AI model. The application will analyze resumes against predefined skill sets and job descriptions, generating a numerical score indicative of overall suitability.",
@@ -273,6 +241,68 @@ export const DATA = {
         }
       ],
       image: "/ai-resume-proj.png",
+      video:
+        "",
+    },
+    {
+      title: "Dhanush's Portfolio",
+      href: "https://itsdhanu.me",
+      dates: "October 2024",
+      active: true,
+      description:
+        "Designed and Developed a responsive portfolio using Next.Js framework, for fast and reliable performance and well experienced UI",
+      technologies: [
+        "Next.js",
+        "React.js",
+        "Typescript",
+        "TailwindCSS",
+        "Github Actions",
+        "Cloudflare",
+        "Cloudflare Workers",
+      ],
+      links: [
+        {
+          type: "Website",
+          href: "https://itsdhanu.me/",
+          icon: <Icons.globe className="size-3" />,
+        },
+        {
+          type: "Github",
+          href: "https://github.com/dhanushk-offl/dhanu",
+          icon: <Icons.github className="size-3" />
+        }
+      ],
+      image: "/portfolio.png",
+      video:
+        "",
+    },
+    {
+      title: "KAIPULLA: Quirky AI Buddy of Yours",
+      href: "https://kaipulla.itsdhanu.me",
+      dates: "November 2024",
+      active: true,
+      description:
+        "Experience personalized care at your fingertips. Our AI companion, powered by Google Gemini Vision Pro and Meta LLama 3, offers round-the-clock emotional support in multiple languages (English, Tamil, Telugu, Malayalam, Kannada, and Hindi).",
+      technologies: [
+        "Next.js",
+        "Typescript",
+        "TailwindCSS",
+        "Vite",
+        "Github Actions",
+        "Cloudflare",
+        "Cloudflare Workers",
+        "Meta Llama 3",
+        "Google Gemini Vision Pro",
+        "FastAPI"
+      ],
+      links: [
+        {
+          type: "Website",
+          href: "https://kaipulla.itsdhanu.me/",
+          icon: <Icons.globe className="size-3" />,
+        }
+      ],
+      image: "/kaipulla_ai.png",
       video:
         "",
     },
