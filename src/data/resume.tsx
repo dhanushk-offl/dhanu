@@ -93,7 +93,7 @@ export const DATA = {
       title: "Software Engineer Intern",
       logoUrl: "/talentship.jpeg",
       start: "Aug 2024",
-      end: "Present",
+      end: "October 2024",
       description:
         "Working With Front-ends Projects using React Framework for Smart Company Goals Management System. Designing the aspect applications to ensure the proper acquirements of web apps!",
     },
