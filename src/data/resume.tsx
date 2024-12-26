@@ -62,6 +62,12 @@ export const DATA = {
         icon: Icons.youtube,
         navbar: true,
       },
+      Spotify: {
+        name: "Spotify",
+        url: "https://open.spotify.com/show/7wNAoRcAzNzEf51JhNH3vo",
+        icon: Icons.spotify,
+        navbar: true,
+      },
       email: {
         name: "Send Email",
         url: "mailto:dhanushkandhan75@gmail.com",
@@ -140,8 +146,8 @@ export const DATA = {
       href: "https://www.annauniv.edu/",
       degree: "Bachelor's Degree of Information Technology (B.Tech IT)",
       logoUrl: "/anna_univ.png",
-      start: "2022",
-      end: "2026",
+      start: "",
+      end: "",
     },
     {
       school: "Massachusetts Institute of Technology, USA",
